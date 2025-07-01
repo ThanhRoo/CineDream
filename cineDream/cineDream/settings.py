@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     'apps.cinema',
     'apps.schedule',
     'apps.seats',    
+    
 ]
-
 
 
 MIDDLEWARE = [

@@ -1,26 +1,203 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
-<html>
+<html lang="vi">
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Trang chu</title>
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang chủ</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .heading {
+        font-size: 2rem;
+      }
+    </style>
   </head>
   <body>
-    <h1>Test trang chu</h1>
-    <!--[if lt IE 7]>
-      <p class="browsehappy">
-        You are using an <strong>outdated</strong> browser. Please
-        <a href="#">upgrade your browser</a> to improve your experience.
-      </p>
-    <![endif]-->
+    <!--  Menubar với Đăng nhập / Đăng ký -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-uppercase" href="#">CineDream</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <script src="" async defer></script>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Trang chủ</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#phimdangchieu">Lịch chiếu</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#phimsapchieu">Phim</a>
+            </li>
+          </ul>
+          <div class="d-flex">
+            <a href="login" class="btn btn-outline-light me-2">Đăng nhập</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!--  Dữ liệu JS giả lập -->
+    <script>
+      const listMovie = [
+        {
+          title: "Phim A",
+          image: "https://via.placeholder.com/200x300",
+          href: "#",
+        },
+        {
+          title: "Phim B",
+          image: "https://via.placeholder.com/200x300",
+          href: "#",
+        },
+        {
+          title: "Phim C",
+          image: "https://via.placeholder.com/200x300",
+          href: "#",
+        },
+      ];
+
+      const listCommingMovies = [
+        {
+          title: "Phim D",
+          image: "https://via.placeholder.com/200x300",
+          href: "#",
+        },
+        {
+          title: "Phim E",
+          image: "https://via.placeholder.com/200x300",
+          href: "#",
+        },
+      ];
+
+      const banners = [
+        {
+          image:
+            "https://metiz.vn/media/slide_home/bi-kip-luyen-rong-2048_1749195168873.jpg",
+          href: "#",
+        },
+        {
+          image: "https://metiz.vn/media/slide_home/doraemon_WlD1ewo.jpg",
+          href: "#",
+        },
+      ];
+    </script>
+
+    <div class="container my-4">
+      <!--  Carousel -->
+      <div
+        id="carouselExampleCaptions"
+        class="carousel slide"
+        data-bs-ride="carousel"
+        data-bs-interval="5000"
+      >
+        <div class="carousel-inner" id="banner-carousel">
+          <!-- Banners will be injected here -->
+        </div>
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#carouselExampleCaptions"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#carouselExampleCaptions"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+
+      <!--  Movies -->
+      <h2
+        id="phimdangchieu"
+        class="text-uppercase text-center text-dark heading mb-4 fw-bold"
+      >
+        Phim đang chiếu
+      </h2>
+      <div class="row g-3" id="movies-wrapper">
+        <!-- Movies will be injected here -->
+      </div>
+
+      <!--  Comming Movies -->
+      <h2
+        id="phimsapchieu"
+        class="text-uppercase text-center text-dark heading mb-4 mt-5 fw-bold"
+      >
+        Phim sắp chiếu
+      </h2>
+      <div class="row g-3" id="comming-movies-wrapper">
+        <!-- Coming movies will be injected here -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Banners
+        const bannerContainer = document.getElementById("banner-carousel");
+        banners.forEach((banner, i) => {
+          const item = document.createElement("div");
+          item.className = `carousel-item ${i === 0 ? "active" : ""}`;
+          item.innerHTML = `
+      <a href="${banner.href}">
+        <img src="${banner.image}" class="d-block w-100" style="aspect-ratio: 1215/365; object-fit: cover;">
+      </a>
+    `;
+          bannerContainer.appendChild(item);
+        });
+
+        // Movies
+        const movieWrapper = document.getElementById("movies-wrapper");
+        listMovie.forEach((movie) => {
+          const col = document.createElement("div");
+          col.className = "col-md-3 col-sm-6";
+          col.innerHTML = `
+      <div class="card h-100">
+        <img src="${movie.image}" class="card-img-top" alt="${movie.title}">
+        <div class="card-body">
+          <h5 class="card-title text-center">${movie.title}</h5>
+        </div>
+      </div>
+    `;
+          movieWrapper.appendChild(col);
+        });
+
+        // Coming Movies
+        const comingWrapper = document.getElementById("comming-movies-wrapper");
+        listCommingMovies.forEach((movie) => {
+          const col = document.createElement("div");
+          col.className = "col-md-3 col-sm-6";
+          col.innerHTML = `
+      <div class="card h-100">
+        <img src="${movie.image}" class="card-img-top" alt="${movie.title}">
+        <div class="card-body">
+          <h5 class="card-title text-center">${movie.title}</h5>
+        </div>
+      </div>
+    `;
+          comingWrapper.appendChild(col);
+        });
+      });
+    </script>
+
+    <!--  JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

@@ -8,7 +8,7 @@ class Movie(models.Model):
     movie_trailer = models.TextField()
     movie_genres = models.CharField(max_length=255)
     movie_release = models.DateField()
-    movie_lenght = models.IntegerField()
+    movie_lenght = models.TimeField()
     movie_format = models.CharField(max_length=50)
     movie_image_poster = models.TextField()
 

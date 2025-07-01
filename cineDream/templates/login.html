@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đăng nhập / Đăng ký</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.9/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <style>
+      .tab-control-it {
+        font-family: "Anton", sans-serif;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 0.4rem 0.4rem 0 0;
+      }
+
+      .tab-control-it.active {
+        border: 2px solid rgb(228, 140, 68);
+        border-bottom: none;
+        background-color: white;
+      }
+
+      .tab-control-it.inav-active {
+        border-bottom: solid 2px rgb(228, 140, 68);
+        color: white;
+        background-color: rgb(4, 81, 116);
+      }
+
+      .form-container {
+        border: 2px solid rgb(228, 140, 68);
+        border-top: none;
+        border-radius: 0 0 0.4rem 0.4rem;
+        padding: 2rem;
+      }
+
+      .button {
+        background-color: rgb(4, 81, 116);
+        border: solid rgb(255, 199, 0);
+        color: white;
+      }
+
+      .button:hover {
+        border-color: rgb(4, 81, 116);
+      }
+
+      .hidden-row {
+        display: none;
+      }
+
+      .invalid-feedback {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" x-data="formHandler()">
+      <div class="row justify-content-center my-4">
+        <div class="col-md-8 col-lg-6">
+          <div class="d-flex">
+            <div
+              class="col-6 text-center tab-control-it"
+              :class="tab === 'login' ? 'active' : 'inav-active'"
+              @click="tab = 'login'"
+            >
+              <h4 class="m-0">Đăng nhập</h4>
+            </div>
+            <div
+              class="col-6 text-center tab-control-it"
+              :class="tab === 'signup' ? 'active' : 'inav-active'"
+              @click="tab = 'signup'"
+            >
+              <h4 class="m-0">Đăng ký</h4>
+            </div>
+          </div>
+
+          <form class="form-container mt-0" @submit.prevent="submitForm">
+            <!-- Row: Họ tên -->
+            <div class="mb-3" :class="tab === 'signup' ? '' : 'hidden-row'">
+              <label class="form-label">Họ và tên</label>
+              <input
+                type="text"
+                x-model="data.fullname"
+                class="form-control"
+                :class="{'is-invalid': errors.fullname}"
+              />
+              <div class="invalid-feedback" x-text="errors.fullname"></div>
+            </div>
+            <!-- Row: Email -->
+            <div class="mb-3" :class="tab === 'signup' ? '' : 'hidden-row'">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                x-model="data.email"
+                class="form-control"
+                :class="{'is-invalid': errors.email}"
+              />
+              <div class="invalid-feedback" x-text="errors.email"></div>
+            </div>
+
+            <!-- Row: Tên đăng nhập -->
+            <div class="mb-3" :class="tab === 'login' ? '' : 'hidden-row'">
+              <label class="form-label">Tên đăng nhập</label>
+              <input type="text" x-model="data.username" class="form-control" />
+            </div>
+
+            <!-- Row: Mật khẩu -->
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <input
+                type="password"
+                x-model="data.password"
+                class="form-control"
+                :class="{'is-invalid': errors.password}"
+              />
+              <div class="invalid-feedback" x-text="errors.password"></div>
+            </div>
+
+            <!-- Row: Xác nhận mật khẩu -->
+            <div class="mb-3" :class="tab === 'signup' ? '' : 'hidden-row'">
+              <label class="form-label">Xác nhận mật khẩu</label>
+              <input
+                type="password"
+                x-model="data.rePassword"
+                class="form-control"
+                :class="{'is-invalid': errors.rePassword}"
+              />
+              <div class="invalid-feedback" x-text="errors.rePassword"></div>
+            </div>
+
+            <div class="form-check mb-3" x-show="tab === 'login'">
+              <input type="checkbox" class="form-check-input" id="remember" />
+              <label class="form-check-label" for="remember"
+                >Lưu mật khẩu đăng nhập</label
+              >
+            </div>
+
+            <div class="mb-3">
+              <input
+                type="submit"
+                class="form-control button text-uppercase"
+                :value="tab === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ'"
+              />
+            </div>
+
+            <div class="text-center">
+              <template x-if="tab === 'login'">
+                <p>
+                  Bạn chưa có tài khoản?
+                  <a href="#" @click.prevent="tab = 'signup'">Đăng ký</a>
+                </p>
+              </template>
+              <template x-if="tab === 'signup'">
+                <p>
+                  Đã có tài khoản?
+                  <a href="#" @click.prevent="tab = 'login'">Đăng nhập</a>
+                </p>
+              </template>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function formHandler() {
+        return {
+          tab: "login",
+          data: {
+            fullname: "",
+            dateOfBirth: "",
+            email: "",
+            phone: "",
+            username: "",
+            password: "",
+            rePassword: "",
+          },
+          errors: {},
+          validate() {
+            this.errors = {};
+
+            if (this.tab === "signup") {
+              if (!this.data.fullname)
+                this.errors.fullname = "Họ và tên không được để trống";
+              if (!this.data.email || !this.data.email.includes("@"))
+                this.errors.email = "Email không hợp lệ";
+              if (this.data.password.length < 6)
+                this.errors.password = "Mật khẩu ít nhất 6 ký tự";
+              if (this.data.password !== this.data.rePassword)
+                this.errors.rePassword = "Mật khẩu không khớp";
+            } else {
+              if (!this.data.username)
+                this.errors.username = "Tên đăng nhập không được để trống";
+              if (!this.data.password)
+                this.errors.password = "Mật khẩu không được để trống";
+            }
+
+            return Object.keys(this.errors).length === 0;
+          },
+          submitForm() {
+            if (!this.validate()) return;
+
+            if (this.tab === "signup") {
+              const payload = {
+                fullname: this.data.fullname,
+                phone: this.data.phone,
+                dateOfBirth: this.data.dateOfBirth,
+                email: this.data.email,
+                password: this.data.password,
+              };
+              axios
+                .post("/dang-ky", payload)
+                .then(() => alert("Đăng ký thành công"))
+                .catch((err) => console.log(err));
+            } else {
+              axios
+                .post("/dang-nhap", {
+                  username: this.data.username,
+                  password: this.data.password,
+                })
+                .then(() => alert("Đăng nhập thành công"))
+                .catch((err) => console.log(err));
+            }
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
