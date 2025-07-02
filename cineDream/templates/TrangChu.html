@@ -12,6 +12,87 @@
       .heading {
         font-size: 2rem;
       }
+
+      .movie-box {
+        width: 100%;
+        max-width: 250px;
+        margin: auto;
+        text-align: center;
+        color: white;
+        font-family: sans-serif;
+      }
+
+      .movie-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 5px;
+      }
+
+      .movie-poster {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .movie-title {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-top: 0.5rem;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .movie-meta {
+        font-size: 0.85rem;
+        line-height: 1.2;
+      }
+
+      .age-badge {
+        color: #f39c12;
+        font-weight: bold;
+      }
+
+      .movie-actions {
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      .movie-box {
+        transition: transform 0.3s;
+      }
+      .movie-box:hover {
+        transform: scale(1.02);
+      }
+
+      .movie-poster {
+        width: 100%;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+      }
+
+      .movie-title {
+        font-size: 1rem;
+        text-align: center;
+        font-weight: bold;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .movie-meta {
+        font-size: 0.85rem;
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      .age-badge {
+        color: #f39c12;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -44,7 +125,15 @@
             </li>
           </ul>
           <div class="d-flex">
-            <a href="login" class="btn btn-outline-light me-2">Đăng nhập</a>
+            {% if user.is_authenticated %}
+            <span class="me-3 text-white">Xin chào, <strong>{{ user.username }}</strong></span>
+            <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light">Đăng xuất</button>
+            </form>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Đăng nhập</a>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -52,7 +141,7 @@
 
     <!--  Dữ liệu JS giả lập -->
     <script>
-      const listMovie = [
+      {% comment %} const listMovie = [
         {
           title: "Phim A",
           image: "https://via.placeholder.com/200x300",
@@ -81,7 +170,7 @@
           image: "https://via.placeholder.com/200x300",
           href: "#",
         },
-      ];
+      ]; {% endcomment %}
 
       const banners = [
         {
@@ -132,8 +221,45 @@
       >
         Phim đang chiếu
       </h2>
-      <div class="row g-3" id="movies-wrapper">
-        <!-- Movies will be injected here -->
+      <div class="row g-3 justify-content-center">
+        {% for movie in movies %}
+        <div class="col-md-3 col-sm-6">
+          <div class="movie-box bg-dark p-2 rounded text-white">
+            <div class="movie-image-wrapper">
+              <a href="#" target="_blank">
+              <img
+                src="{{ movie.movie_image_poster }}"
+                alt="{{ movie.movie_name }}"
+                class="movie-poster rounded"
+              />
+              </a>
+            </div>
+            <div class="movie-info mt-2">
+              <h5 class="movie-title bg-secondary text-white py-1 px-2 rounded">
+                {{ movie.movie_name }}
+              </h5>
+              <p class="movie-meta mt-1 mb-2">
+                {{ movie.movie_lenght | time:"H:i:s" }} PHÚT
+                <span class="age-badge text-warning fw-bold"
+                ><br />
+                KHỞI CHIẾU {{ movie.movie_release|date:"d-m-Y" }}
+              </p>
+              <div class="movie-actions d-flex justify-content-center gap-2">
+                <a
+                  href="{{ movie.movie_trailer }}"
+                  class="btn btn-outline-light btn-sm"
+                  target="_blank"
+                  >TRAILER</a
+                >
+
+                <a href="#" class="btn btn-outline-light btn-sm">ĐẶT VÉ</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted">Chưa có phim nào.</p>
+        {% endfor %}
       </div>
 
       <!--  Comming Movies -->
@@ -143,10 +269,41 @@
       >
         Phim sắp chiếu
       </h2>
-      <div class="row g-3" id="comming-movies-wrapper">
-        <!-- Coming movies will be injected here -->
+<div class="row g-3 justify-content-center">
+  {% for movie in coming_movies %}
+  <div class="col-md-3 col-sm-6">
+    <div class="movie-box bg-dark p-2 rounded text-white">
+      <div class="movie-image-wrapper">
+        <a href="#" target="_blank">
+        <img
+          src="{{ movie.movie_image_poster }}"
+          alt="{{ movie.movie_name }}"
+          class="movie-poster rounded"
+        />
+        </a>
+      </div>
+      <div class="movie-info mt-2">
+        <h5 class="movie-title bg-secondary text-white py-1 px-2 rounded">
+          {{ movie.movie_name }}
+        </h5>
+       
+          {{ movie.movie_lenght | time:"H:i:s" }} PHÚT
+          <br />
+           <span class="age-badge text-warning fw-bold" >
+          KHỞI CHIẾU {{ movie.movie_release|date:"d-m-Y" }}
+        </p>
+        <div class="movie-actions d-flex justify-content-center gap-2">
+          <a href="{{ movie.movie_trailer }}" class="btn btn-outline-light btn-sm" target="_blank">TRAILER</a>
+          
+        </div>
       </div>
     </div>
+  </div>
+  {% empty %}
+  <p class="text-center text-muted">Không có phim sắp chiếu.</p>
+  {% endfor %}
+</div>
+
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -156,43 +313,11 @@
           const item = document.createElement("div");
           item.className = `carousel-item ${i === 0 ? "active" : ""}`;
           item.innerHTML = `
-      <a href="${banner.href}">
-        <img src="${banner.image}" class="d-block w-100" style="aspect-ratio: 1215/365; object-fit: cover;">
-      </a>
-    `;
+        <a href="${banner.href}">
+          <img src="${banner.image}" class="d-block w-100" style="aspect-ratio: 1215/365; object-fit: cover;">
+        </a>
+      `;
           bannerContainer.appendChild(item);
-        });
-
-        // Movies
-        const movieWrapper = document.getElementById("movies-wrapper");
-        listMovie.forEach((movie) => {
-          const col = document.createElement("div");
-          col.className = "col-md-3 col-sm-6";
-          col.innerHTML = `
-      <div class="card h-100">
-        <img src="${movie.image}" class="card-img-top" alt="${movie.title}">
-        <div class="card-body">
-          <h5 class="card-title text-center">${movie.title}</h5>
-        </div>
-      </div>
-    `;
-          movieWrapper.appendChild(col);
-        });
-
-        // Coming Movies
-        const comingWrapper = document.getElementById("comming-movies-wrapper");
-        listCommingMovies.forEach((movie) => {
-          const col = document.createElement("div");
-          col.className = "col-md-3 col-sm-6";
-          col.innerHTML = `
-      <div class="card h-100">
-        <img src="${movie.image}" class="card-img-top" alt="${movie.title}">
-        <div class="card-body">
-          <h5 class="card-title text-center">${movie.title}</h5>
-        </div>
-      </div>
-    `;
-          comingWrapper.appendChild(col);
         });
       });
     </script>
