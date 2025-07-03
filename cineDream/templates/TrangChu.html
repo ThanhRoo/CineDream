@@ -99,7 +99,7 @@
     <!--  Menubar với Đăng nhập / Đăng ký -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold text-uppercase" href="#">CineDream</a>
+        <a class="navbar-brand fw-bold text-uppercase" href="{% url 'home' %}">CineDream</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -115,7 +115,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" href="#">Trang chủ</a>
+              <a class="nav-link active" href="{% url 'home' %}">Trang chủ</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#phimdangchieu">Lịch chiếu</a>
@@ -226,7 +226,7 @@
         <div class="col-md-3 col-sm-6">
           <div class="movie-box bg-dark p-2 rounded text-white">
             <div class="movie-image-wrapper">
-              <a href="#" target="_blank">
+              <a href="phim/{{ movie.id }}/chi-tiet/">
               <img
                 src="{{ movie.movie_image_poster }}"
                 alt="{{ movie.movie_name }}"
@@ -274,7 +274,7 @@
   <div class="col-md-3 col-sm-6">
     <div class="movie-box bg-dark p-2 rounded text-white">
       <div class="movie-image-wrapper">
-        <a href="#" target="_blank">
+        <a href="phim/{{ movie.id }}/chi-tiet/" >
         <img
           src="{{ movie.movie_image_poster }}"
           alt="{{ movie.movie_name }}"
