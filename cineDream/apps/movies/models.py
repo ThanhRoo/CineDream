@@ -12,6 +12,11 @@ class Movie(models.Model):
     movie_format = models.CharField(max_length=50)
     movie_image_poster = models.TextField()
 
+
+    def get_lenght_minutes(self):
+        """Trả về độ dài phim tính bằng phút."""
+        return self.movie_lenght.hour * 60 + self.movie_lenght.minute
+    
     class Meta:
         db_table = 'Movie'
         managed = False

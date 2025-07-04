@@ -4,7 +4,7 @@ from .models import Movie
 from urllib.parse import urlparse, parse_qs
 
 def trang_chu(request):
-    return render(request, 'home.html')
+    return render(request, 'home')
 
 def extract_youtube_id(url):
     try:
@@ -20,3 +20,6 @@ def chiTietPhim(request, phim_id):
 
 
 
+def danhSachPhim(request):
+    ds_phim = Movie.objects.all()
+    return render(request, 'movies/Phim.html',{'ds_phim': ds_phim})
