@@ -120,10 +120,10 @@
               <a class="nav-link active" href="{% url 'home' %}">Trang chủ</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#phimdangchieu">Lịch chiếu</a>
+              <a class="nav-link" href="{% url 'lich_chieu' %}">Lịch chiếu</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#phimsapchieu">Phim</a>
+              <a class="nav-link" href="{% url 'danh_sach_phim' %}">Phim</a>
             </li>
           </ul>
           <div class="d-flex">
@@ -176,8 +176,22 @@
               <p style="text-align: justify">{{ phim.movie_description }}</p>
             </div>
             <!-- Nút đặt vé  -->
-            <div class="text-center mt-4">
-              <a href="#" class="btn btn-dark px-4 py-2">ĐẶT VÉ</a>
+            <div class="btn btn-dark btn-sm">
+              {% if user.is_authenticated %}
+              <a
+                href="{% url 'chon_lich_chieu' phim.id %}"
+                class="btn btn-outline-light btn-sm"
+              >
+                ĐẶT VÉ
+              </a>
+              {% else %}
+              <a
+                href="{% url 'login' %}?next={% url 'chon_lich_chieu' phim.id %}"
+                class="btn btn-outline-light btn-sm"
+              >
+                ĐẶT VÉ
+              </a>
+              {% endif %}
             </div>
           </div>
         </div>

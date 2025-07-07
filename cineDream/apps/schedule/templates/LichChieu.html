@@ -93,6 +93,43 @@
         color: #f39c12;
         font-weight: bold;
       }
+      .schedule-card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        width: 190px;
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 14px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .schedule-card strong {
+        display: block;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 4px;
+        margin-bottom: 4px;
+        font-size: 16px;
+      }
+
+      .schedule-card span {
+        display: block;
+        font-size: 13px;
+        color: #333;
+      }
+      .date-item.active {
+        background-color: #ff5500;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .date-item {
+        cursor: pointer;
+        padding: 10px;
+        bor-
     </style>
   </head>
 
@@ -118,10 +155,10 @@
             <a class="nav-link" href="{% url 'home' %}">Trang chủ</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'lich_chieu' %}">Lịch chiếu</a>
+            <a class="nav-link active" href="#">Lịch chiếu</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="{% url 'danh_sach_phim'%}">Phim</a>
+            <a class="nav-link" href="{% url 'danh_sach_phim'%}">Phim</a>
           </li>
         </ul>
         <div class="d-flex">
@@ -144,61 +181,78 @@
       </div>
     </div>
   </nav>
+
   <body>
-    <div class="container py-5">
-      <div class="row">
-        {% for phim in ds_phim %}
-        <div class="col-md-3 col-sm-6 mb-4">
-          <div class="text-center position-relative">
-            <!-- Poster phim -->
-            <a href="{% url 'chi_tiet_phim' phim.id %}">
-              <img
-                src="{{ phim.movie_image_poster }}"
-                alt="{{ phim.movie_name }}"
-                class="img-fluid rounded movie-poster"
-              />
-            </a>
-            <!-- Tên phim -->
-            <div
-              class="fw-bold text-uppercase mt-2"
-              style="
-                font-size: 0.95rem;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              "
-            >
-              {{ phim.movie_name }}
-            </div>
+    <section style="padding: 40px">
+      <h2 style="color: #ff5500; font-size: 24px; font-weight: bold">
+        Lịch chiếu
+      </h2>
 
-            <!-- Thông tin thể loại, thời lượng, phân loại -->
-            <div style="font-size: 0.85rem; line-height: 1.4">
-              THỂ LOẠI: {{ phim.movie_genres }}<br />
-              {{ phim.get_lenght_minutes }} PHÚT
-              <br />
-              KHỞI CHIẾU: {{ phim.movie_release|date:"d-m-Y" }}
-            </div>
+      <!-- Chọn ngày chiếu -->
+      <div
+        id="date-picker"
+        style="background: #f8f5ed; padding: 20px; margin-top: 10px"
+      >
+        <p style="font-weight: bold">Chọn ngày chiếu</p>
+        <div style="display: flex; gap: 20px; margin-top: 10px">
+          {% for day in days %}
+          <div
+            class="date-item {% if selected_date == day.date %}active{% endif %}"
+            data-date="{{ day.date|date:'Y-m-d' }}"
+          >
+            {{ day.weekday }}<br /><span style="font-size: 18px"
+              >{{ day.date|date:"d" }}</span
+            >
+          </div>
+          {% endfor %}
+        </div>
+      </div>
 
-            <!-- Nút đặt vé -->
-            {% if user.is_authenticated %}
-            <a
-              href="{% url 'chon_lich_chieu' phim.id %}"
-              class="btn btn-outline-light btn-sm"
-            >
-              ĐẶT VÉ
-            </a>
-            {% else %}
-            <a
-              href="{% url 'login' %}?next={% url 'chon_lich_chieu' phim.id %}"
-              class="btn btn-outline-light btn-sm"
-            >
-              ĐẶT VÉ
-            </a>
-            {% endif %}
+      <!-- Danh sách lịch chiếu -->
+      <div id="schedule-container" style="margin-top: 30px">
+        {% for movie in movies %}
+        <div style="margin-bottom: 40px">
+          <h3 style="font-weight: bold">{{ movie.movie_name }}</h3>
+          <div style="display: flex; gap: 20px; align-items: flex-start">
+            <img
+              src="{{ movie.poster }}"
+              alt="{{ movie.movie_name }}"
+              style="width: 120px; border-radius: 4px"
+            />
+            <div style="display: flex; gap: 10px; flex-wrap: wrap">
+              {% for schedule in movie.schedules %}
+              <div class="schedule-card">
+                <strong>
+                  Bắt đầu: {{ schedule.schedule_start }}<br />
+                  Kết thúc: {{ schedule.schedule_end }} </strong
+                ><br />
+                <span>Phòng chiếu {{ schedule.room.room_name }}</span>
+              </div>
+              {% endfor %}
+            </div>
           </div>
         </div>
+        {% empty %}
+        <p>Không có lịch chiếu cho ngày này.</p>
         {% endfor %}
       </div>
-    </div>
+    </section>
+
+    <script>
+      document.querySelectorAll(".date-item").forEach((item) => {
+        item.addEventListener("click", function () {
+          const selectedDate = this.getAttribute("data-date");
+
+          // Đánh dấu ngày đang chọn
+          document
+            .querySelectorAll(".date-item")
+            .forEach((el) => el.classList.remove("active"));
+          this.classList.add("active");
+
+          // Gửi request AJAX
+          window.location.href = `/lich-chieu/?date=${selectedDate}`;
+        });
+      });
+    </script>
   </body>
 </html>

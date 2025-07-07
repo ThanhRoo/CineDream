@@ -27,6 +27,6 @@ urlpatterns = [
     path("dang-nhap", views.auth_view , name ='login'),
     path("dang-ky", views.auth_view),
     path("phim/",include ("apps.movies.urls")),
-
+    path("lich-chieu/", include("apps.schedule.urls")),
     
 ]

@@ -7,8 +7,8 @@ class Schedule(models.Model):
     movie = models.ForeignKey('movies.Movie', on_delete=models.DO_NOTHING, db_column='movie_id')
     room = models.ForeignKey('room.Room', on_delete=models.DO_NOTHING, db_column='room_id')
     schedule_date = models.DateField()
-    schedule_start = models.DateTimeField()
-    schedule_end = models.DateTimeField()
+    schedule_start = models.TimeField()
+    schedule_end = models.TimeField()
 
     class Meta:
         db_table = 'Schedule'
