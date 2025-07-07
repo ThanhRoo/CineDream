@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class Seats(models.Model):
     id = models.AutoField(primary_key=True)
-    seat_type = models.CharField(max_length=50)
+    seat_type = models.IntegerField()
     room = models.ForeignKey('room.Room', on_delete=models.DO_NOTHING, db_column='room_id')
     row_label = models.CharField(max_length=5)
     number = models.IntegerField()

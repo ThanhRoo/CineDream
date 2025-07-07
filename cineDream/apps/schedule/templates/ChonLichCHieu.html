@@ -218,19 +218,21 @@
               alt="{{ movie.movie_name }}"
               style="width: 120px; border-radius: 4px"
             />
-            <a href="#"
-             style="text-decoration: none; color: inherit;">
+           
+             <style="text-decoration: none; color: inherit;">
             <div style="display: flex; gap: 10px; flex-wrap: wrap">
              {% if schedules %}
                 {% for schedule in schedules %}
+                 <a href="{% url 'chon_ghe' schedule.id %}">
                 <div class="schedule-card">
             <strong>
                 Bắt đầu: {{ schedule.schedule_start }}<br />
                 Kết thúc: {{ schedule.schedule_end }}
             </strong><br />
              <span>Phòng chiếu {{ schedule.room.room_name }}</span>
+          </a>
             </div>
-            </a>
+         
                 {% endfor %}
             {% else %}
                  <p>Không có lịch chiếu cho ngày này.</p>

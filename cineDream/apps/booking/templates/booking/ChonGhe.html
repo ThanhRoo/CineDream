@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phim</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .heading {
+        font-size: 2rem;
+      }
+
+      .movie-box {
+        width: 100%;
+        max-width: 250px;
+        margin: auto;
+        text-align: center;
+        color: white;
+        font-family: sans-serif;
+      }
+
+      .movie-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 5px;
+      }
+
+      .movie-poster {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .movie-title {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-top: 0.5rem;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .movie-meta {
+        font-size: 0.85rem;
+        line-height: 1.2;
+      }
+
+      .age-badge {
+        color: #f39c12;
+        font-weight: bold;
+      }
+
+      .movie-actions {
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      .movie-box {
+        transition: transform 0.3s;
+      }
+      .movie-box:hover {
+        transform: scale(1.02);
+      }
+
+      .movie-poster {
+        width: 100%;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+      }
+
+      .movie-title {
+        font-size: 1rem;
+        text-align: center;
+        font-weight: bold;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .movie-meta {
+        font-size: 0.85rem;
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      .age-badge {
+        color: #f39c12;
+        font-weight: bold;
+      }
+      .schedule-card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        width: 190px;
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 14px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .schedule-card strong {
+        display: block;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 4px;
+        margin-bottom: 4px;
+        font-size: 16px;
+      }
+
+      .schedule-card span {
+        display: block;
+        font-size: 13px;
+        color: #333;
+      }
+
+    .seat {
+     border: 1px solid #999;
+    }
+
+    .seat.gray { background: #ccc; cursor: not-allowed; }       /* Ghế đã đặt */
+    .seat.green { background: #4CAF50; color: white; }          /* Ghế đang chọn */
+    .seat.white { background: white; }                          /* Ghế thường */
+    .seat.yellow { background: #FFEB3B; }                       /* Ghế VIP */
+    .seat.purple { background: #9C27B0; color: white; }         /* Ghế cao cấp */
+    .seat.pink { background: #E91E63; color: white; }           /* Ghế couple */
+
+.legend.box {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border: 1px solid #999;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.legend.box.gray    { background-color: #ccc; }
+.legend.box.green   { background-color: #4CAF50; }
+.legend.box.white   { background-color: white; border: 1px solid #999; }
+.legend.box.yellow  { background-color: #FFEB3B; }
+.legend.box.purple  { background-color: #9C27B0; }
+.legend.box.pink    { background-color: #E91E63; }
+
+    </style>
+  </head>
+
+  <!--  Menubar với Đăng nhập / Đăng ký -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-uppercase" href="/">CineDream</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">Trang chủ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Lịch chiếu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'danh_sach_phim'%}">Phim</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          {% if user.is_authenticated %}
+          <span class="me-3 text-white"
+            >Xin chào, <strong>{{ user.username }}</strong></span
+          >
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light">
+              Đăng xuất
+            </button>
+          </form>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline-light me-2"
+            >Đăng nhập</a
+          >
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+</html>
+<body>
+
+</body>
+<div class="seat-selection-container" style="display: flex; justify-content: space-between; padding: 20px;">
+  <!-- Ghế -->
+  <div class="seat-area" style="width: 65%;">
+    <h3>Chọn ghế</h3>
+    <div class="screen" style="text-align: center; margin-bottom: 10px; padding: 10px; background: repeating-linear-gradient(45deg, #ccc, #ccc 10px, #eee 10px, #eee 20px);">
+      MÀN HÌNH
+    </div>
+
+    <!-- Ghế xếp hàng -->
+    <div class="seat-map">
+      <!-- Dòng ghế -->      
+      {% for row in seat_rows %}
+        <div class="seat-row" style="display: flex; align-items: center; margin-bottom: 5px;">
+          <span style="width: 20px;">{{ row.label }}</span>
+          {% for seat in row.seats %}
+            <div
+              class="seat {{ seat.css_class }}"
+              style="width: 32px; height: 32px; margin: 2px; line-height: 32px; text-align: center; border-radius: 4px; font-size: 12px; cursor: pointer;"
+              data-seat="{{ seat.code }}"
+              data-original-class="{{ seat.css_class }}"
+            >
+              {{ seat.code }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Thông tin phim -->
+  <div class="info-panel" style="width: 30%;">
+    <img src="{{ movie.movie_image_poster }}" alt="poster" style="width: 50%; margin-bottom: 10px;">
+    <p><strong>Phim:</strong> {{ movie.movie_name }}</p>
+    <p><strong>Ngày:</strong> {{ selected_date }}</p>
+    <p><strong>Thời gian:</strong> {{ schedule.schedule_start}} - {{ schedule.schedule_end }}</p>
+    <p><strong>Ghế:</strong> <span id="selected-seats">0</span></p>
+    <p><strong>Số vé:</strong> <span id="ticket-count">0</span></p>
+    <p><strong>Tổng tiền:</strong> <span id="total-amount">0 VNĐ</span></p>
+
+  <div class="seat-legend mt-4">
+    <div><span class="legend box gray"></span> Ghế đã đặt</div>
+    <div><span class="legend box green"></span> Ghế đang chọn</div>
+    <div><span class="legend box white"></span> Ghế thường</div>
+    <div><span class="legend box yellow"></span> Ghế VIP</div>
+    <div><span class="legend box purple"></span> Ghế cao cấp</div>
+    <div><span class="legend box pink"></span> Ghế couple</div>
+  </div>
+
+    <div style="margin-top: 20px;">
+      <button onclick="window.history.back()" class="btn btn-secondary">⬅ Đổi suất chiếu</button>
+      <button class="btn btn-warning float-end">Tiếp tục ➡</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const seatElements = document.querySelectorAll(".seat");
+    const selectedSeatsDisplay = document.getElementById("selected-seats");
+    const ticketCountDisplay = document.getElementById("ticket-count");
+    const totalAmountDisplay = document.getElementById("total-amount");
+
+    const seatPrices = {
+      white: 70000,   // Ghế thường
+      yellow: 90000,  // Ghế VIP
+      purple: 120000, // Ghế cao cấp
+      pink: 150000,   // Ghế couple
+    };
+
+    let selectedSeats = [];
+
+    seatElements.forEach(seat => {
+      seat.addEventListener("click", function () {
+        const seatCode = seat.dataset.seat;
+        const originalClass = seat.dataset.originalClass; // Lấy màu gốc
+
+        if (seat.classList.contains("gray")) return; // Đã đặt
+
+        if (seat.classList.contains("green")) {
+          // Bỏ chọn
+          seat.classList.remove("green");
+          seat.classList.add(originalClass);
+          selectedSeats = selectedSeats.filter(s => s.code !== seatCode);
+        } else {
+          // Chọn
+          seat.classList.remove(originalClass);
+          seat.classList.add("green");
+          selectedSeats.push({ code: seatCode, type: originalClass });
+        }
+
+        updateSummary();
+      });
+    });
+
+    function updateSummary() {
+      const seatCodes = selectedSeats.map(s => s.code);
+      const total = selectedSeats.reduce((sum, s) => sum + (seatPrices[s.type] || 0), 0);
+
+      selectedSeatsDisplay.textContent = seatCodes.length > 0 ? seatCodes.join(", ") : "0";
+      ticketCountDisplay.textContent = seatCodes.length;
+      totalAmountDisplay.textContent = total.toLocaleString("vi-VN") + " VNĐ";
+    }
+  });
+</script>
+
+
+</html>
