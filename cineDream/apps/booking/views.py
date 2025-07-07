@@ -47,11 +47,11 @@ def chon_ghe(request, schedule_id):
 
 def get_css_class(seat_type):
     seat_type = str(seat_type).lower()
-    if seat_type == '4':
+    if seat_type == '150000':
         return 'yellow'
-    elif seat_type == '3':
+    elif seat_type == '120000':
         return 'purple'
-    elif seat_type == '2':
+    elif seat_type == '90000':
         return 'pink'
     else:
         return 'white'
