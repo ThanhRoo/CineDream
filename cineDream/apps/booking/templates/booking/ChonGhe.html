@@ -231,6 +231,7 @@
   </div>
 
   <!-- Thông tin phim -->
+
   <div class="info-panel" style="width: 30%;">
     <img src="{{ movie.movie_image_poster }}" alt="poster" style="width: 50%; margin-bottom: 10px;">
     <p><strong>Phim:</strong> {{ movie.movie_name }}</p>
@@ -239,6 +240,9 @@
     <p><strong>Ghế:</strong> <span id="selected-seats">0</span></p>
     <p><strong>Số vé:</strong> <span id="ticket-count">0</span></p>
     <p><strong>Tổng tiền:</strong> <span id="total-amount">0 VNĐ</span></p>
+
+
+
 
   <div class="seat-legend mt-4">
     <div><span class="legend box gray"></span> Ghế đã đặt</div>
@@ -251,7 +255,19 @@
 
     <div style="margin-top: 20px;">
       <button onclick="window.history.back()" class="btn btn-secondary">⬅ Đổi suất chiếu</button>
-      <button class="btn btn-warning float-end">Tiếp tục ➡</button>
+     
+          <form method="post" action="{% url 'thanh_toan' movie.id schedule.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="movie_id" value="{{ movie.id }}"> 
+    <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+    <input type="hidden" name="selected_date" value="{{ selected_date }}">
+    <input type="hidden" name="selected_seats" id="selected-seats-input" value="{{ selected_seats|join:", " }}">
+    <input type="hidden" name="ticket_count" id="ticket-count-input" value="{{ ticket_count }}">
+    <input type="hidden" name="total_amount" id="total-amount-input" value="{{ total_amount }}">
+    <button type="submit" class="btn btn-warning float-end">Tiếp tục ➡</button>
+      
+    </form>
+      
     </div>
   </div>
 </div>
@@ -302,6 +318,9 @@
       selectedSeatsDisplay.textContent = seatCodes.length > 0 ? seatCodes.join(", ") : "0";
       ticketCountDisplay.textContent = seatCodes.length;
       totalAmountDisplay.textContent = total.toLocaleString("vi-VN") + " VNĐ";
+      document.getElementById("selected-seats-input").value = seatCodes.join(", ");
+      document.getElementById("ticket-count-input").value = seatCodes.length;
+      document.getElementById("total-amount-input").value = total;
     }
   });
 </script>

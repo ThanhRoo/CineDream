@@ -2,7 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from apps.schedule.models import Schedule
 from apps.seats.models import Seats
 from apps.booking.models import Booking
-
+from apps.movies.models import Movie
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 def chon_ghe(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     movie = schedule.movie
@@ -55,3 +57,46 @@ def get_css_class(seat_type):
         return 'pink'
     else:
         return 'white'
+
+def thanh_toan(request, movie_id, schedule_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+
+    if request.method == 'POST':
+        seat_codes = request.POST.get("selected_seats", "").split(", ")  # ["A1", "A2", "B3"]
+        seats = []
+        selected_seats = []  # dùng để render lại
+
+        for code in seat_codes:
+            row = code[0]
+            number = code[1:]
+            try:
+                seat = Seats.objects.get(row_label=row, number=int(number), room=schedule.room)
+                seats.append(seat)
+                selected_seats.append(code)
+            except Seats.DoesNotExist:
+                continue  # Bỏ qua nếu không tìm thấy ghế
+
+        total_amount = request.POST.get('total_amount')
+        userBooking = request.user
+
+        for seat in seats:
+            Booking.objects.create(
+                user=userBooking,
+                schedule=schedule,
+                seat=seat,
+                price=seat.seat_type,
+                seat_status=1
+            )
+
+        return render(request, 'booking/ThanhToan.html', {
+            'movie': movie,
+            'schedule': schedule,
+            'selected_seats': selected_seats,
+            'total_amount': total_amount,
+        })
+
+    return render(request, 'booking/ThanhToan.html', {
+        'movie': movie,
+        'schedule': schedule,
+    })

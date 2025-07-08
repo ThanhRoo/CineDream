@@ -47,13 +47,13 @@ def lich_chieu(request):
     selected_date_str = request.GET.get('date')
     selected_date = parse_selected_date(selected_date_str) if selected_date_str else today
 
-    # Lấy lịch chiếu trong ngày
+    # Lấy lịch chiếu trong ngày , kem voi thông tin khoan ngoai movie và room
     schedules = Schedule.objects.select_related('movie', 'room').filter(schedule_date=selected_date)
     movie_dict = defaultdict(list)
     for s in schedules:
         movie_dict[s.movie].append(s)
 
-    # Chuẩn bị dữ liệu gửi về template
+    # gửi về template
     movies = []
     for movie, sched_list in movie_dict.items():
         movies.append({
