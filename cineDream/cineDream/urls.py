@@ -29,4 +29,5 @@ urlpatterns = [
     path("phim/",include ("apps.movies.urls")),
     path("lich-chieu/", include("apps.schedule.urls")),
     path("dat-ve/", include("apps.booking.urls")),
+    path("api/chatbot/", views.chatbot_response, name="chatbot_api"),
 ]

@@ -155,5 +155,10 @@
       <strong>Ghế đã chọn:</strong> {{ selected_seats|join:", " }}<br />
       <strong>Tổng tiền:</strong> {{ total_amount|floatformat:0 }} ₫
     </p>
+    <h3>Mã QR:</h3>
+    <img
+      src="{{ qr_code|safe }}"
+      style="max-width: 300px; border: 1px solid red"
+    />
   </div>
 </body>
