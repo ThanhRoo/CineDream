@@ -255,8 +255,8 @@
 
     <div style="margin-top: 20px;">
       <button onclick="window.history.back()" class="btn btn-secondary">⬅ Đổi suất chiếu</button>
-     
-          <form method="post" action="{% url 'thanh_toan' movie.id schedule.id %}">
+
+          <form method="post" action="{% url 'thanh_toan_momo' movie.id  %}">
     {% csrf_token %}
     <input type="hidden" name="movie_id" value="{{ movie.id }}"> 
     <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
