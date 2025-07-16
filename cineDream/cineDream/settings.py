@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [ 'localhost',
     '127.0.0.1',
     '.ngrok-free.app',    # chấp nhận mọi subdomain ngrok
     'https://622a508ef481.ngrok-free.app', # thay doi moi khi khoi dong lai ngrok
-    'https://a11ce6e85dab.ngrok-free.app' 
+    'https://c5c96cf98c0a.ngrok-free.app ' 
     ]
 
 # Your current ngrok domain (thay đổi khi bạn tạo mới ngrok)

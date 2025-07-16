@@ -20,7 +20,7 @@ from django.urls import reverse
 from apps.temporarybooking.models import TemporaryBooking
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
-
+from apps.room.models import Room
 User = get_user_model()
 def chon_ghe(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
@@ -116,8 +116,8 @@ def thanh_toan_momo(request, movie_id):
             accessKey = "F8BBA842ECF85"
             secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz"
             orderInfo = f"Thanh toán vé xem phim: {movie.movie_name}"
-            redirectUrl = f"https://a11ce6e85dab.ngrok-free.app/dat-ve/momo/return?token={str(temp.token)}" # thay doi moi khi khoi dong lai ngrok
-            ipnUrl = "https://a11ce6e85dab.ngrok-free.app/momo/ipn/" # thay doi moi khi khoi dong lai ngrok
+            redirectUrl = f"https://c5c96cf98c0a.ngrok-free.app/dat-ve/momo/return?token={str(temp.token)}" # thay doi moi khi khoi dong lai ngrok
+            ipnUrl = "https://c5c96cf98c0a.ngrok-free.app/momo/ipn/" # thay doi moi khi khoi dong lai ngrok
 
             amount =  request.POST.get('total_amount')
             orderId = str(uuid.uuid4())
@@ -229,9 +229,9 @@ def thanh_toan(request, token):
 
     qr_data = f"Phim: {movie.movie_name}\nSuất chiếu: {schedule.schedule_date} {schedule.schedule_start}\nGhế: {', '.join(selected_seats)}\nTổng tiền: {total_amount} VND"
     qr_code_img = generate_qr_code(qr_data)
-
+    
     user = User.objects.get(username = userBooking)
-    send_ticket_email(user.email,user.username,schedule.schedule_date,schedule.schedule_start,booking_seats,qr_code_img)
+    send_ticket_email(user.email,user.username,schedule.schedule_date,schedule.schedule_start,schedule.room ,booking_seats,qr_code_img)
     
     return render(request, 'booking/Ve.html', {
         'movie': movie,
@@ -243,11 +243,11 @@ def thanh_toan(request, token):
 
 
 
-def send_ticket_email(user_email, user_name, schedule_date , schedule_start , seats, qr_code_img):
+def send_ticket_email(user_email, user_name, schedule_date , schedule_start ,room ,seats, qr_code_img):
 
     email = EmailMessage(
         subject="Xác nhận đặt vé - CineDream 🎬",
-        body=f"Xin chào {user_name},\n\nBạn đã đặt vé thành công!\n\nThông tin vé:\nSuất chiếu:{schedule_date} {schedule_start}\nGhế:{seats}\n\nQR code được đính kèm để quét tại rạp.",
+        body=f"Xin chào {user_name},\n\nBạn đã đặt vé thành công!\n\nThông tin vé:\nSuất chiếu:{schedule_date} {schedule_start}\nPhòng{room}\nGhế:{seats}\n\nQR code được đính kèm để quét tại rạp.",
         from_email="CineDream <your_email@gmail.com>",
         to=[user_email],
     )
