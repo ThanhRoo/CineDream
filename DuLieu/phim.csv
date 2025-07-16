@@ -11,3 +11,11 @@ id,movie_name,movie_description,movie_trailer,movie_genres,movie_release,movie_l
 10,"THÁM TỬ LỪNG DANH CONAN - DƯ ẢNH CỦA ĐỘC NHÃN","Conan Movie 28 chứng kiến spotlight thuộc về thám tử Mori Kogoro và bộ ba thanh tra tỉnh Nagano",https://www.youtube.com/watch?v=dz5mN-iIC4g,"Tình cảm,Hoạt hình,Bí Ẩn",2025-07-25,00:02:20,2d,https://metiz.vn/media/poster_film/conan.jpg
 11,"LÀM GIÀU VỚI MA 2","Hành trình đầy bi hài của 5 con người với những toan tính khác nhau nhằm đưa thi thể minh tinh Anh Thư (Ngọc Xuân) về quê nhà, đổi lại, hồn ma của cô hứa sẽ trả cho họ chiếc nhẫn kim cương trị giá 9 tỷ. Ai sẽ là người giành được phần thưởng, hay chuyến đi sẽ bộc lộ phần xấu xa nhất bên trong họ?",https://youtu.be/U5QnIPrY-wc,"Hành động,Hài,Tâm Lý",2025-09-02,00:01:40,2d,https://metiz.vn/media/poster_film/lamgiauvoima2Firstlook.jpg
 12,"MƯA ĐỎ","“Mưa Đỏ” - Phim truyện điện ảnh về đề tài chiến tranh cách mạng, kịch bản của nhà văn Chu Lai, lấy cảm hứng và hư cấu từ sự kiện 81 ngày đêm chiến đấu anh dũng, kiên cường của nhân dân và cán bộ, chiến sĩ bảo vệ Thành Cổ Quảng Trị năm 1972. Tiểu đội 1 gồm toàn những thanh niên trẻ tuổi và đầy nhiệt huyết là một trong những đơn vị chiến đấu, bám trụ tại trận địa khốc liệt này. Bộ phim là khúc tráng ca bằng hình ảnh, là nén tâm nhang tri ân và tưởng nhớ những người con đã dâng hiến tuổi thanh xuân cho đất nước, mang âm hưởng của tình yêu, tình đồng đội thiêng liêng, là khát vọng hòa bình, hoà hợp dân tộc của nhân dân Việt Nam.",https://youtu.be/3N3lUVGqrhw,"Hành động,Lịch Sử",2025-09-02,00:02:20,2d,https://metiz.vn/media/poster_film/muado.jpg
+
+
+& "C:\Users\Legion 5 Pro\AppData\Local\Programs\Python\Python313\python.exe" manage.py
+
+.\ngrok http 8000 // chay tren terminal thu muc ngrok
+
+
+htha esvo jykm qamy

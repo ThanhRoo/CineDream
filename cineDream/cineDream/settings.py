@@ -27,10 +27,24 @@ DEBUG = True
 
 ALLOWED_HOSTS = [ 'localhost',
     '127.0.0.1',
-    '11001214f920.ngrok-free.app',
+    '.ngrok-free.app',    # chấp nhận mọi subdomain ngrok
+    'https://622a508ef481.ngrok-free.app', # thay doi moi khi khoi dong lai ngrok
+    'https://a11ce6e85dab.ngrok-free.app' 
     ]
 
+# Your current ngrok domain (thay đổi khi bạn tạo mới ngrok)
+DOMAIN = "https://32f36a32d2f2.ngrok-free.app"  # fallback cho local dev
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.app', # tin tưởng tất cả
+]
 
+# email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'thanhvo130602@gmail.com'
+EMAIL_HOST_PASSWORD = 'htha esvo jykm qamy'  # không dùng mật khẩu Gmail thường
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,6 +63,7 @@ INSTALLED_APPS = [
     'apps.cinema',
     'apps.schedule',
     'apps.seats',    
+    'apps.temporarybooking',
     
 ]
 

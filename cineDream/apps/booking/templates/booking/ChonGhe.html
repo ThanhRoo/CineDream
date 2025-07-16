@@ -253,10 +253,10 @@
     <div><span class="legend box pink"></span> Ghế couple</div>
   </div>
 
-    <div style="margin-top: 20px;">
-      <button onclick="window.history.back()" class="btn btn-secondary">⬅ Đổi suất chiếu</button>
+    <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+  <button onclick="window.history.back()" class="btn btn-secondary">⬅ Đổi suất chiếu</button>
 
-          <form method="post" action="{% url 'thanh_toan_momo' movie.id  %}">
+  <form method="post" action="{% url 'thanh_toan_momo' movie.id  %}" style="margin: 0;">
     {% csrf_token %}
     <input type="hidden" name="movie_id" value="{{ movie.id }}"> 
     <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
@@ -264,11 +264,10 @@
     <input type="hidden" name="selected_seats" id="selected-seats-input" value="{{ selected_seats|join:", " }}">
     <input type="hidden" name="ticket_count" id="ticket-count-input" value="{{ ticket_count }}">
     <input type="hidden" name="total_amount" id="total-amount-input" value="{{ total_amount }}">
-    <button type="submit" class="btn btn-warning float-end">Tiếp tục ➡</button>
-      
-    </form>
-      
-    </div>
+    <button type="submit" class="btn btn-warning">Tiếp tục ➡</button>
+  </form>
+  </div>
+
   </div>
 </div>
 

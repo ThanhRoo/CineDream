@@ -88,10 +88,39 @@
         text-align: center;
         line-height: 1.3;
       }
+      .qr-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+      }
 
-      .age-badge {
-        color: #f39c12;
+      .qr-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+
+      .qr-label {
+        position: absolute;
+        top: -25px; /* Điều chỉnh khoảng cách với hình */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        padding: 4px 12px;
+        border-radius: 5px;
         font-weight: bold;
+        z-index: 1;
+      }
+
+      .qr-image {
+        max-width: 300px;
+        border: 1px solid red;
+        display: block;
+      }
+
+      .qr-code {
+        width: 250px; /* hoặc auto */
+        height: auto;
       }
     </style>
   </head>
@@ -146,19 +175,20 @@
   </nav>
 </html>
 <body>
-  <h1 class="heading">Thông tin thanh toán</h1>
   <div class="container mt-4">
     <h2 class="movie-title">{{ movie.movie_name }}</h2>
     <p class="movie-meta">
       <strong>Ngày chiếu:</strong> {{ schedule.schedule_date }}<br />
-      <strong>Giờ chiếu:</strong> {{ schedule.start_time }}<br />
+      <strong>Giờ chiếu:</strong> {{ schedule.schedule_start }}<br />
       <strong>Ghế đã chọn:</strong> {{ selected_seats|join:", " }}<br />
       <strong>Tổng tiền:</strong> {{ total_amount|floatformat:0 }} ₫
     </p>
-    <h3>Mã QR:</h3>
-    <img
-      src="{{ qr_code|safe }}"
-      style="max-width: 300px; border: 1px solid red"
-    />
+
+    <div class="qr-container">
+      <div class="qr-wrapper">
+        <div class="qr-label">Mã QR</div>
+        <img src="{{ qr_code|safe }}" alt="QR Code" class="qr-image" />
+      </div>
+    </div>
   </div>
 </body>

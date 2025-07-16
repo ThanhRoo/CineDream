@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 import qrcode
 from io import BytesIO
-import base64
+from base64 import b64decode
 import uuid
 import hmac
 import hashlib
@@ -17,7 +17,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.http import HttpResponse
 from django.urls import reverse
+from apps.temporarybooking.models import TemporaryBooking
+from django.core.mail import EmailMessage
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 def chon_ghe(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     movie = schedule.movie
@@ -100,24 +104,26 @@ def thanh_toan_momo(request, movie_id):
 
         if request.method == 'POST':
         # Gọi API MoMo
-            request.session['booking_data'] = {
-            'movie_id': movie.id,
-            'schedule_id': request.POST.get("schedule_id", None),
-            'selected_seats': request.POST.get("selected_seats", ""),  # "A1, A2"
-            'total_amount': request.POST.get("total_amount", "0")
-            }
+            temp = TemporaryBooking.objects.create(
+                movie=movie,
+                schedule=get_object_or_404(Schedule, id=request.POST.get("schedule_id")),
+                selected_seats=request.POST.get("selected_seats", ""),
+                total_amount=request.POST.get("total_amount", "0")
+            )
+
             endpoint = "https://test-payment.momo.vn/v2/gateway/api/create"
             partnerCode = "MOMO"
             accessKey = "F8BBA842ECF85"
             secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz"
             orderInfo = f"Thanh toán vé xem phim: {movie.movie_name}"
-            redirectUrl = "https://11001214f920.ngrok-free.app/dat-ve/momo/return/" # ← thay bằng domain thật
-            ipnUrl = "https://11001214f920.ngrok-free.app/momo/ipn/"          # ← thay bằng domain thật
+            redirectUrl = f"https://a11ce6e85dab.ngrok-free.app/dat-ve/momo/return?token={str(temp.token)}" # thay doi moi khi khoi dong lai ngrok
+            ipnUrl = "https://a11ce6e85dab.ngrok-free.app/momo/ipn/" # thay doi moi khi khoi dong lai ngrok
+
             amount =  request.POST.get('total_amount')
             orderId = str(uuid.uuid4())
             requestId = str(uuid.uuid4())
             requestType = "captureWallet"
-            extraData = ""  # hoặc encode thêm info nếu cần
+            extraData = str(temp.token)   # hoặc encode thêm info nếu cần
 
             rawSignature = f"accessKey={accessKey}&amount={amount}&extraData={extraData}&ipnUrl={ipnUrl}&orderId={orderId}&orderInfo={orderInfo}&partnerCode={partnerCode}&redirectUrl={redirectUrl}&requestId={requestId}&requestType={requestType}"
             signature = hmac.new(
@@ -152,91 +158,102 @@ def thanh_toan_momo(request, movie_id):
                 return HttpResponse("Không thể tạo link thanh toán MoMo", status=500)
 
 def momo_return(request):
-    print("Session Keys:", request.session.keys())
-    print("Full session data:", dict(request.session))
+    token = request.GET.get("token")
+    if not token:
+        return HttpResponse("Lỗi: Không có token xác thực.")
 
-    result_code = request.GET.get("resultCode")
-    message = request.GET.get("message")
+    try:
+        temp_booking = TemporaryBooking.objects.get(token=token)
+    except TemporaryBooking.DoesNotExist:
+        return HttpResponse("Lỗi: Không tìm thấy dữ liệu đặt vé.")
 
-    if result_code == "0":
-        booking_data = request.session.get('booking_data')
-        if not booking_data:
-            return HttpResponse("Lỗi: Không tìm thấy dữ liệu đặt vé.")
+    # Trả về theo path chứa token 
+    return redirect(reverse('thanh_toan', kwargs={'token': str(temp_booking.token)}))
 
-        movie_id = booking_data['movie_id']
-        schedule_id = booking_data['schedule_id']
-
-        return redirect(
-            reverse('thanh_toan', args=[movie_id, schedule_id])
-        )
-    return HttpResponse("❌ Thanh toán thất bại: " + message)
 
 
 @csrf_exempt
 def momo_ipn(request):
-    result_code = request.GET.get("resultCode")
-    message = request.GET.get("message")
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"message": "Invalid JSON"}, status=400)
 
-    if result_code == "0":
-        booking_data = request.session.get('booking_data')
-        if not booking_data:
-            return HttpResponse("Lỗi: Không tìm thấy dữ liệu đặt vé.")
+    result_code = str(data.get("resultCode"))
+    token = data.get("extraData")
 
-        movie_id = booking_data['movie_id']
-        schedule_id = booking_data['schedule_id']
+    if result_code == "0" and token:
+        try:
+            temp_booking = TemporaryBooking.objects.get(token=token)
+        except TemporaryBooking.DoesNotExist:
+            return JsonResponse({"message": "Không tìm thấy đặt chỗ"}, status=400)
 
-        # Redirect tới thanh_toan để lưu vé và tạo QR
-        return redirect(
-            reverse('thanh_toan', args=[movie_id, schedule_id])
+        # Bạn có thể xử lý lưu vé chính thức ở đây nếu muốn
+
+        return JsonResponse({"message": "IPN received successfully"}, status=200)
+
+    return JsonResponse({"message": "Thanh toán thất bại"}, status=400)
+
+
+def thanh_toan(request, token):
+    temp = get_object_or_404(TemporaryBooking, token=token)
+    movie = Movie.objects.get(id=temp.movie.id)
+    schedule = temp.schedule
+    booking_seats = temp.selected_seats
+    
+    seat_codes = booking_seats.split(", ")
+    seats = []
+    selected_seats = []
+
+    for code in seat_codes:
+        row = code[0]
+        number = code[1:]
+        try:
+            seat = Seats.objects.get(row_label=row, number=int(number), room=schedule.room)
+            seats.append(seat)
+            selected_seats.append(code)
+        except Seats.DoesNotExist:
+            continue
+
+    total_amount = temp.total_amount
+    userBooking = request.user
+
+    for seat in seats:
+        Booking.objects.create(
+            user=userBooking,
+            schedule=schedule,
+            seat=seat,
+            price=seat.seat_type,
+            seat_status=1
         )
 
-    return HttpResponse("❌ Thanh toán thất bại: " + message)
+    qr_data = f"Phim: {movie.movie_name}\nSuất chiếu: {schedule.schedule_date} {schedule.schedule_start}\nGhế: {', '.join(selected_seats)}\nTổng tiền: {total_amount} VND"
+    qr_code_img = generate_qr_code(qr_data)
 
-def thanh_toan(request, movie_id, schedule_id):
-    movie = get_object_or_404(Movie, id=movie_id)
-    schedule = get_object_or_404(Schedule, id=schedule_id)
+    user = User.objects.get(username = userBooking)
+    send_ticket_email(user.email,user.username,schedule.schedule_date,schedule.schedule_start,booking_seats,qr_code_img)
     
-    booking_data = request.session.get('booking_data')
-    if booking_data:
-        seat_codes = booking_data.get("selected_seats", "").split(", ")
-        seats = []
-        selected_seats = []
-
-        for code in seat_codes:
-            row = code[0]
-            number = code[1:]
-            try:
-                seat = Seats.objects.get(row_label=row, number=int(number), room=schedule.room)
-                seats.append(seat)
-                selected_seats.append(code)
-            except Seats.DoesNotExist:
-                continue
-
-        total_amount = booking_data.get("total_amount")
-        userBooking = request.user
-
-        for seat in seats:
-            Booking.objects.create(
-                user=userBooking,
-                schedule=schedule,
-                seat=seat,
-                price=seat.seat_type,
-                seat_status=1
-            )
-
-        qr_data = f"Phim: {movie.movie_name}\nSuất chiếu: {schedule.schedule_date} {schedule.schedule_start}\nGhế: {', '.join(selected_seats)}\nTổng tiền: {total_amount} VND"
-        qr_code_img = generate_qr_code(qr_data)
-
-        return render(request, 'booking/ThanhToan.html', {
-            'movie': movie,
-            'schedule': schedule,
-            'selected_seats': selected_seats,
-            'total_amount': total_amount,
-            'qr_code': qr_code_img
-        })
-
-    # Không có session, render lại trang trung gian
     return render(request, 'booking/Ve.html', {
         'movie': movie,
         'schedule': schedule,
+        'selected_seats': selected_seats,
+        'total_amount': total_amount,
+        'qr_code': qr_code_img
     })
+
+
+
+def send_ticket_email(user_email, user_name, schedule_date , schedule_start , seats, qr_code_img):
+
+    email = EmailMessage(
+        subject="Xác nhận đặt vé - CineDream 🎬",
+        body=f"Xin chào {user_name},\n\nBạn đã đặt vé thành công!\n\nThông tin vé:\nSuất chiếu:{schedule_date} {schedule_start}\nGhế:{seats}\n\nQR code được đính kèm để quét tại rạp.",
+        from_email="CineDream <your_email@gmail.com>",
+        to=[user_email],
+    )
+    qr_base64 = qr_code_img.split(',')[1]  # loại bỏ phần 'data:image/png;base64,'
+    # Chuyển về dạng bytes
+    qr_image_bytes = b64decode(qr_base64)
+
+    email.attach("ticket_qr.png", qr_image_bytes, "image/png")
+    email.send()
