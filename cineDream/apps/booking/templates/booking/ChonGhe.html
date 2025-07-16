@@ -203,18 +203,18 @@
 </body>
 <div class="seat-selection-container" style="display: flex; justify-content: space-between; padding: 20px;">
   <!-- Ghế -->
-  <div class="seat-area" style="width: 65%;">
+  <div class="seat-area" style="width: 65%; display: flex; flex-direction: column; align-items: center;">
     <h3>Chọn ghế</h3>
-    <div class="screen" style="text-align: center; margin-bottom: 10px; padding: 10px; background: repeating-linear-gradient(45deg, #ccc, #ccc 10px, #eee 10px, #eee 20px);">
+    <div class="screen" style="text-align: center; margin-bottom: 10px; padding: 10px; background: repeating-linear-gradient(45deg, #ccc, #ccc 10px, #eee 10px, #eee 20px); width: 100%;">
       MÀN HÌNH
     </div>
 
     <!-- Ghế xếp hàng -->
-    <div class="seat-map">
+    <div class="seat-map" style="display: flex; flex-direction: column; align-items: center;">
       <!-- Dòng ghế -->      
       {% for row in seat_rows %}
-        <div class="seat-row" style="display: flex; align-items: center; margin-bottom: 5px;">
-          <span style="width: 20px;">{{ row.label }}</span>
+        <div class="seat-row" style="display: flex; align-items: center; justify-content: center; margin-bottom: 5px; width: 100%;">
+          <span style="width: 20px; margin-right: 8px;">{{ row.label }}</span>
           {% for seat in row.seats %}
             <div
               class="seat {{ seat.css_class }}"
@@ -229,6 +229,7 @@
       {% endfor %}
     </div>
   </div>
+
 
   <!-- Thông tin phim -->
 
