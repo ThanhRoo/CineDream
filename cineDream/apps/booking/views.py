@@ -22,6 +22,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from apps.room.models import Room
 User = get_user_model()
+
 def chon_ghe(request, schedule_id):
     schedule = get_object_or_404(Schedule, id=schedule_id)
     movie = schedule.movie
@@ -47,7 +48,6 @@ def chon_ghe(request, schedule_id):
             seat_rows[seat.row_label] = []
 
         seat_rows[seat.row_label].append(seat_data)
-
 
     # Lấy ngày từ schedule (điều chỉnh theo model của bạn)
     selected_date = schedule.schedule_date if hasattr(schedule, 'schedule_date') else 'N/A'
@@ -101,14 +101,15 @@ def generate_qr_code(data: str) -> str:
 
 def thanh_toan_momo(request, movie_id): 
         movie = get_object_or_404(Movie, id=movie_id)
-
+        userBooking = request.user if request.user.is_authenticated else None
         if request.method == 'POST':
         # Gọi API MoMo
             temp = TemporaryBooking.objects.create(
                 movie=movie,
                 schedule=get_object_or_404(Schedule, id=request.POST.get("schedule_id")),
                 selected_seats=request.POST.get("selected_seats", ""),
-                total_amount=request.POST.get("total_amount", "0")
+                total_amount=request.POST.get("total_amount", "0"),
+                user_name=userBooking.username if userBooking else None
             )
 
             endpoint = "https://test-payment.momo.vn/v2/gateway/api/create"
@@ -116,8 +117,8 @@ def thanh_toan_momo(request, movie_id):
             accessKey = "F8BBA842ECF85"
             secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz"
             orderInfo = f"Thanh toán vé xem phim: {movie.movie_name}"
-            redirectUrl = f"https://c5c96cf98c0a.ngrok-free.app/dat-ve/momo/return?token={str(temp.token)}" # thay doi moi khi khoi dong lai ngrok
-            ipnUrl = "https://c5c96cf98c0a.ngrok-free.app/momo/ipn/" # thay doi moi khi khoi dong lai ngrok
+            redirectUrl = f"https://dcd8073068c5.ngrok-free.app/dat-ve/momo/return?token={str(temp.token)}" # thay doi moi khi khoi dong lai ngrok
+            ipnUrl = "https://dcd8073068c5.ngrok-free.app/dat-ve/momo/ipn/" # thay doi moi khi khoi dong lai ngrok
 
             amount =  request.POST.get('total_amount')
             orderId = str(uuid.uuid4())
@@ -174,6 +175,7 @@ def momo_return(request):
 
 @csrf_exempt
 def momo_ipn(request):
+    print("🔥🔥 MoMo IPN was called 🔥🔥")
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -188,8 +190,41 @@ def momo_ipn(request):
         except TemporaryBooking.DoesNotExist:
             return JsonResponse({"message": "Không tìm thấy đặt chỗ"}, status=400)
 
-        # Bạn có thể xử lý lưu vé chính thức ở đây nếu muốn
+        #  xử lý lưu vé chính thức 
+        temp = get_object_or_404(TemporaryBooking, token=token)
+        movie = Movie.objects.get(id=temp.movie.id)
+        schedule = temp.schedule
+        booking_seats = temp.selected_seats
+        userBooking =  User.objects.get(username=temp.user_name)
+        total_amount = temp.total_amount
+        seat_codes = booking_seats.split(", ")
+        seats = []
+        selected_seats = []
 
+        for code in seat_codes:
+            row = code[0]
+            number = code[1:]
+            try:
+                seat = Seats.objects.get(row_label=row, number=int(number), room=schedule.room)
+                seats.append(seat)
+                selected_seats.append(code)
+            except Seats.DoesNotExist:
+                continue       
+
+        for seat in seats:
+            Booking.objects.create(
+                user=userBooking,
+                schedule=schedule,
+                seat=seat,
+                price=seat.seat_type,
+                seat_status=1
+            )
+        qr_data = f"Phim: {movie.movie_name}\nSuất chiếu: {schedule.schedule_date} {schedule.schedule_start}\nGhế: {', '.join(selected_seats)}\nTổng tiền: {total_amount} VND"
+        qr_code_img = generate_qr_code(qr_data)
+
+        # Gửi email xác nhận
+        user = User.objects.get(username = userBooking)
+        send_ticket_email(user.email,user.username,schedule.schedule_date,schedule.schedule_start,schedule.room ,booking_seats,qr_code_img)
         return JsonResponse({"message": "IPN received successfully"}, status=200)
 
     return JsonResponse({"message": "Thanh toán thất bại"}, status=400)
@@ -200,7 +235,7 @@ def thanh_toan(request, token):
     movie = Movie.objects.get(id=temp.movie.id)
     schedule = temp.schedule
     booking_seats = temp.selected_seats
-    
+    userBooking =  User.objects.get(username=temp.user_name)
     seat_codes = booking_seats.split(", ")
     seats = []
     selected_seats = []
@@ -216,22 +251,11 @@ def thanh_toan(request, token):
             continue
 
     total_amount = temp.total_amount
-    userBooking = request.user
-
-    for seat in seats:
-        Booking.objects.create(
-            user=userBooking,
-            schedule=schedule,
-            seat=seat,
-            price=seat.seat_type,
-            seat_status=1
-        )
 
     qr_data = f"Phim: {movie.movie_name}\nSuất chiếu: {schedule.schedule_date} {schedule.schedule_start}\nGhế: {', '.join(selected_seats)}\nTổng tiền: {total_amount} VND"
     qr_code_img = generate_qr_code(qr_data)
     
-    user = User.objects.get(username = userBooking)
-    send_ticket_email(user.email,user.username,schedule.schedule_date,schedule.schedule_start,schedule.room ,booking_seats,qr_code_img)
+
     
     return render(request, 'booking/Ve.html', {
         'movie': movie,

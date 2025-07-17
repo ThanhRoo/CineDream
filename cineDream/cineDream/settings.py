@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [ 'localhost',
     '127.0.0.1',
     '.ngrok-free.app',    # chấp nhận mọi subdomain ngrok
     'https://622a508ef481.ngrok-free.app', # thay doi moi khi khoi dong lai ngrok
-    'https://c5c96cf98c0a.ngrok-free.app ' 
+    'https://dcd8073068c5.ngrok-free.app' 
     ]
 
 # Your current ngrok domain (thay đổi khi bạn tạo mới ngrok)
@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'django_extensions',  # Thêm ứng dụng django-extensions
     # app cua minh 
     
     'apps.movies',

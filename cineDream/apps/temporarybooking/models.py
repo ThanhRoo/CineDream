@@ -11,3 +11,4 @@ class TemporaryBooking(models.Model):
     selected_seats = models.CharField(max_length=255)
     total_amount = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
+    user_name = models.CharField(max_length=100, null=True)
